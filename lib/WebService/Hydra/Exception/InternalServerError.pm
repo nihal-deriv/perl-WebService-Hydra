@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Object::Pad;
 
-our $VERSION = '0.01';
+## VERSION
 
 class WebService::Hydra::Exception::InternalServerError :isa(WebService::Hydra::Exception) {
     

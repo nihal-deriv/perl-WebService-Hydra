@@ -9,7 +9,7 @@ use Module::Load;
 use JSON::MaybeUTF8 qw(encode_json_text);
 use Log::Any qw($log);
 
-our $VERSION = '0.01';
+## VERSION
 
 =head1 NAME
 
