@@ -3,6 +3,8 @@ use strict;
 use warnings;
 use Object::Pad;
 
+our $VERSION = '0.01';
+
 class WebService::Hydra::Exception::InvalidLogoutChallenge :isa(WebService::Hydra::Exception) {
     field $redirect_to :param :reader = undef;
 

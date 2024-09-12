@@ -9,6 +9,8 @@ use Module::Load;
 use JSON::MaybeUTF8 qw(encode_json_text);
 use Log::Any qw($log);
 
+our $VERSION = '0.01';
+
 =head1 NAME
 
 WebService::Hydra::Exception - Base class for all Hydra Exceptions, loading all possible exception types.

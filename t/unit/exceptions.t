@@ -19,7 +19,7 @@ my @exceptions_to_test = qw(
 for my $exception (@exceptions_to_test) {
     my $full_class = "WebService::Hydra::Exception::$exception";
     
-   use_ok $full_class;
+    use_ok $full_class;
     
     is($@, '', "Loaded $full_class successfully");
     

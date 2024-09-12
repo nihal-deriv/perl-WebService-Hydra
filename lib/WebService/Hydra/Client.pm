@@ -15,6 +15,8 @@ use Syntax::Keyword::Try;
 use constant OK_STATUS_CODE          => 200;
 use constant BAD_REQUEST_STATUS_CODE => 400;
 
+our $VERSION = '0.01';
+
 field $http;
 field $admin_endpoint :param :reader;
 field $public_endpoint :param :reader;
