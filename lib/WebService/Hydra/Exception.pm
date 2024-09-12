@@ -96,6 +96,7 @@ method log {
 # Exception class names explicitly listed
 my @all_exceptions = qw(
     HydraServiceUnreachable
+    FeatureUnavailable
     HydraRequestError
     InvalidLoginChallenge
     InvalidLogoutChallenge
