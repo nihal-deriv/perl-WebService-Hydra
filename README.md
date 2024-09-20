@@ -1,1 +1,1 @@
-# perl-WebService-Hydra
+# Ory Hydra Simple Client
