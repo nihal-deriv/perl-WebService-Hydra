@@ -20,6 +20,7 @@ our $VERSION = '0.01';
 
 field $http;
 field $jwks;
+field $oidc_config;
 field $admin_endpoint :param :reader;
 field $public_endpoint :param :reader;
 
@@ -77,13 +78,21 @@ method http {
 }
 
 =head2 jwks
-
 return jwks object
-
 =cut
 
 method jwks {
     return $jwks //= $self->fetch_jwks();
+}
+
+=head2 oidc_config
+
+returns an object with oidc configuration
+
+=cut
+
+method oidc_config {
+    return $oidc_config //= $self->fetch_openid_configuration();
 }
 
 =head2 api_call
@@ -313,6 +322,26 @@ method fetch_jwks () {
     return $result->{data};
 }
 
+=head2 fetch_openid_configuration
+
+Fetches the openid-configuration from hydra
+
+=cut
+
+method fetch_openid_configuration () {
+    my $method = "GET";
+    my $path   = "$public_endpoint/.well-known/openid-configuration";
+
+    my $result = $self->api_call($method, $path);
+    if ($result->{code} != OK_STATUS_CODE) {
+        BOM::OAuth::Exceptions::Type::HydraRequestError->new(
+            category => "hydra",
+            details  => $result
+        )->throw;
+    }
+    return $result->{data};
+}
+
 =head2 validate_id_token
 
 Decodes the id_token and validates its signature against Hydra and returns the decoded payload.
@@ -333,6 +362,31 @@ method validate_id_token ($id_token) {
             details  => $e
         )->throw;
     }
+}
+
+=head2 validate_token
+
+Decodes the token and validates its signature against hydra and returns the decoded payload.
+
+=over 1
+
+=item C<$token> jwt token to be validated
+
+=back
+
+Returns the decoded payload if the token is valid, otherwise throws an exception.
+
+=cut
+
+method validate_token ($token) {
+    my $payload = decode_jwt(
+        token      => $token,
+        verify_iat => 1,
+        verify_exp => 1,
+        verify_iss => $oidc_config->{issuer},
+        kid_keys   => $jwks
+    );
+    return $payload;
 }
 
 =head2 get_consent_request
