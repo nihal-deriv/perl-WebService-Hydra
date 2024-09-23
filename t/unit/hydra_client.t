@@ -406,7 +406,7 @@ subtest 'revoke_login_sessions' => sub {
 
     # Test for 200 OK status code
     $mock_api_response = {
-        code => 201,
+        code => 204,
         data => undef};
     my $got = $client->revoke_login_sessions(subject => '1234');
 

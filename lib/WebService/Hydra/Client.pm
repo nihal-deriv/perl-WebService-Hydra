@@ -13,7 +13,7 @@ use WebService::Hydra::Exception;
 use Syntax::Keyword::Try;
 
 use constant OK_STATUS_CODE          => 200;
-use constant OK_EMPTY_STATUS_CODE    => 201;
+use constant OK_NO_CONTENT_CODE    => 204;
 use constant BAD_REQUEST_STATUS_CODE => 400;
 
 our $VERSION = '0.01';
@@ -455,7 +455,7 @@ method revoke_login_sessions (%args) {
     $path .= "?$query" if $query;
 
     my $result = $self->api_call($method, $path);
-    if ($result->{code} != OK_EMPTY_STATUS_CODE) {
+    if ($result->{code} != OK_NO_CONTENT_CODE) {
         WebService::Hydra::Exception::RevokeLoginSessionsFailed->new(
             message  => "Failed to revoke login sessions",
             category => "client",
