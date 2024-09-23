@@ -19,6 +19,7 @@ use constant BAD_REQUEST_STATUS_CODE => 400;
 our $VERSION = '0.01';
 
 field $http;
+field $jwks;
 field $admin_endpoint :param :reader;
 field $public_endpoint :param :reader;
 
@@ -73,6 +74,16 @@ Return HTTP object.
 
 method http {
     return $http //= HTTP::Tiny->new();
+}
+
+=head2 jwks
+
+return jwks object
+
+=cut
+
+method jwks {
+    return $jwks //= $self->fetch_jwks();
 }
 
 =head2 api_call
@@ -309,7 +320,6 @@ Decodes the id_token and validates its signature against Hydra and returns the d
 =cut
 
 method validate_id_token ($id_token) {
-    my $jwks = $self->fetch_jwks();
     try {
         my $payload = decode_jwt(
             token    => $id_token,

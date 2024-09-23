@@ -12,4 +12,3 @@
   - get_consent_request
   - accept_consent_request
   - revoke_login_sessions
-  
