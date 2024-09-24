@@ -388,6 +388,159 @@ subtest 'accept_logout_request' => sub {
     dies_ok { $client->accept_logout_request("VALID_CHALLENGE") } 'Dies if http request fails for some reason';
 };
 
+subtest 'revoke_login_sessions' => sub {
+    my $mock_hydra = Test::MockModule->new('WebService::Hydra::Client');
+    my $mock_api_response;
+    my @params;
+    $mock_hydra->redefine(
+        'api_call',
+        sub {
+            (@params) = @_;
+            return $mock_api_response;
+        });
+
+    my $client = WebService::Hydra::Client->new(
+        admin_endpoint  => 'http://dummyhydra.com/admin',
+        public_endpoint => 'http://dummyhydra.com'
+    );
+
+    # Test for 200 OK status code
+    $mock_api_response = {
+        code => 204,
+        data => undef};
+    my $got = $client->revoke_login_sessions(subject => '1234');
+
+    is $params[1], 'DELETE', 'DELETE request method';
+    is $params[2], 'http://dummyhydra.com/admin/admin/oauth2/auth/sessions/login?subject=1234',
+        'Request URL built with correct parameters';
+    is_deeply $got , $mock_api_response->{data}, 'api_call response correctly parsed';
+    
+    @params = ();
+    my $got = $client->revoke_login_sessions(sid => '1234');
+
+    is $params[1], 'DELETE', 'DELETE request method';
+    is $params[2], 'http://dummyhydra.com/admin/admin/oauth2/auth/sessions/login?sid=1234',
+        'Request URL built with correct parameters';
+    is_deeply $got , $mock_api_response->{data}, 'api_call response correctly parsed';
+
+    # Test for other non-200 status codes
+    $mock_api_response = {
+        code => 401,
+        data => {
+            error             => "string",
+            error_description => "string",
+            status_code       => 401
+        }};
+    dies_ok { $client->revoke_login_sessions(subject => "invalid") } 'Dies if non-200 status code is received from api_call';
+    my $exception          = $@;
+    my $expected_exception = WebService::Hydra::Exception::RevokeLoginSessionsFailed->new(
+        message  => 'Failed to revoke login sessions',
+        category => 'client',
+        details  => $mock_api_response
+    );
+    is_deeply $exception , $expected_exception, 'Return api_call response for Non 200 status code';
+
+    $mock_hydra->redefine(
+        'api_call',
+        sub {
+            die "Request to http://dummyhydra.com/admin/oauth2/auth/requests/consent/accept?challenge=VALID_CHALLENGE failed - Network issue";
+        });
+
+    dies_ok { $client->accept_logout_request("VALID_CHALLENGE") } 'Dies if http request fails for some reason';
+};
+
+
+subtest 'fetch_openid_configuration' => sub {
+    my $mock_hydra = Test::MockModule->new('WebService::Hydra::Client');
+    my $mock_api_response;
+    my @params;
+    $mock_hydra->redefine(
+        'api_call',
+        sub {
+            (@params) = @_;
+            return $mock_api_response;
+        });
+
+    my $client = WebService::Hydra::Client->new(
+        admin_endpoint  => 'http://dummyhydra.com/admin',
+        public_endpoint => 'http://dummyhydra.com'
+    );
+
+    # Test for 200 OK status code
+    $mock_api_response = {
+        code => 200,
+        data => {
+            issuer                 => 'http://dummyhydra.com',
+            authorization_endpoint => 'http://dummyhydra.com/oauth2/auth',
+            token_endpoint         => 'http://dummyhydra.com/oauth2/token',
+            jwks_uri               => 'http://dummyhydra.com/.well-known/jwks.json',
+        }};
+    my $got = $client->fetch_openid_configuration();
+    is $params[1], 'GET',                                                    'GET request method';
+    is $params[2], 'http://dummyhydra.com/.well-known/openid-configuration', 'Request URL built with correct parameters';
+    is_deeply $got , $mock_api_response->{data}, 'api_call response correctly parsed';
+
+    # Test for other non-200 status codes
+    $mock_api_response = {
+        code => 400,
+        data => {
+            error             => "string",
+            error_description => "string",
+            status_code       => 400
+        }};
+
+    dies_ok { $client->fetch_openid_configuration() } 'Dies if non-200 status code is received from api_call';
+};
+
+subtest 'oidc_config' => sub {
+    my $mock_hydra = Test::MockModule->new('WebService::Hydra::Client');
+    my $mock_api_response;
+    my @params;
+    $mock_hydra->redefine(
+        'fetch_openid_configuration',
+        sub {
+            (@params) = @_;
+            return $mock_api_response;
+        });
+
+    my $client = WebService::Hydra::Client->new(
+        admin_endpoint  => 'http://dummyhydra.com/admin',
+        public_endpoint => 'http://dummyhydra.com'
+    );
+
+    # Test for 200 OK status code
+    $mock_api_response = {
+        issuer                 => 'http://dummyhydra.com',
+        authorization_endpoint => 'http://dummyhydra.com/oauth2/auth',
+        token_endpoint         => 'http://dummyhydra.com/oauth2/token',
+        jwks_uri               => 'http://dummyhydra.com/.well-known/jwks.json',
+    };
+
+    my $got = $client->oidc_config();
+    is_deeply $got, $mock_api_response, 'oidc_config returned correctly';
+
+    subtest 'test cahcing of oidc_config' => sub {
+        my $call_count = 0;
+        $mock_hydra->redefine(
+            'fetch_openid_configuration',
+            sub {
+                $call_count++;
+                return $mock_api_response;
+            });
+
+        my $client = WebService::Hydra::Client->new(
+            admin_endpoint  => 'http://dummyhydra.com/admin',
+            public_endpoint => 'http://dummyhydra.com'
+        );
+        $got = $client->oidc_config();
+        is $call_count, 1, 'fetch_openid_configuration called only once';
+
+        $got = $client->oidc_config();
+        is $call_count, 1, 'fetch_openid_configuration not called again';
+    };
+
+};
+
 done_testing();
 
 1;

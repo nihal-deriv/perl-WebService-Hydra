@@ -6,7 +6,7 @@ use Object::Pad;
 ## VERSION
 
 class WebService::Hydra::Exception::InvalidLoginRequest :isa(WebService::Hydra::Exception) {
-    
+    field $redirect_to :param :reader = undef;
 
     sub BUILDARGS {
         my ($class, %args) = @_;

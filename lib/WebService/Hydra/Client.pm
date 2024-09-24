@@ -13,11 +13,14 @@ use WebService::Hydra::Exception;
 use Syntax::Keyword::Try;
 
 use constant OK_STATUS_CODE          => 200;
+use constant OK_NO_CONTENT_CODE    => 204;
 use constant BAD_REQUEST_STATUS_CODE => 400;
 
 our $VERSION = '0.01';
 
 field $http;
+field $jwks;
+field $oidc_config;
 field $admin_endpoint :param :reader;
 field $public_endpoint :param :reader;
 
@@ -72,6 +75,24 @@ Return HTTP object.
 
 method http {
     return $http //= HTTP::Tiny->new();
+}
+
+=head2 jwks
+return jwks object
+=cut
+
+method jwks {
+    return $jwks //= $self->fetch_jwks();
+}
+
+=head2 oidc_config
+
+returns an object with oidc configuration
+
+=cut
+
+method oidc_config {
+    return $oidc_config //= $self->fetch_openid_configuration();
 }
 
 =head2 api_call
@@ -301,6 +322,26 @@ method fetch_jwks () {
     return $result->{data};
 }
 
+=head2 fetch_openid_configuration
+
+Fetches the openid-configuration from hydra
+
+=cut
+
+method fetch_openid_configuration () {
+    my $method = "GET";
+    my $path   = "$public_endpoint/.well-known/openid-configuration";
+
+    my $result = $self->api_call($method, $path);
+    if ($result->{code} != OK_STATUS_CODE) {
+        BOM::OAuth::Exceptions::Type::HydraRequestError->new(
+            category => "hydra",
+            details  => $result
+        )->throw;
+    }
+    return $result->{data};
+}
+
 =head2 validate_id_token
 
 Decodes the id_token and validates its signature against Hydra and returns the decoded payload.
@@ -308,7 +349,6 @@ Decodes the id_token and validates its signature against Hydra and returns the d
 =cut
 
 method validate_id_token ($id_token) {
-    my $jwks = $self->fetch_jwks();
     try {
         my $payload = decode_jwt(
             token    => $id_token,
@@ -322,6 +362,31 @@ method validate_id_token ($id_token) {
             details  => $e
         )->throw;
     }
+}
+
+=head2 validate_token
+
+Decodes the token and validates its signature against hydra and returns the decoded payload.
+
+=over 1
+
+=item C<$token> jwt token to be validated
+
+=back
+
+Returns the decoded payload if the token is valid, otherwise throws an exception.
+
+=cut
+
+method validate_token ($token) {
+    my $payload = decode_jwt(
+        token      => $token,
+        verify_iat => 1,
+        verify_exp => 1,
+        verify_iss => $oidc_config->{issuer},
+        kid_keys   => $jwks
+    );
+    return $payload;
 }
 
 =head2 get_consent_request
@@ -372,5 +437,32 @@ method accept_consent_request ($consent_challenge, $params) {
     }
     return $result->{data};
 }
+
+
+
+=head2 revoke_login_sessions
+
+This endpoint invalidates authentication sessions.
+It expects a user ID (subject) and invalidates all sessions for this user. or session ID (sid) and invalidates the session.
+
+=cut
+
+method revoke_login_sessions (%args) {
+    my $method = "DELETE";
+    my $path   = "$admin_endpoint/admin/oauth2/auth/sessions/login";
+    
+    my $query  = join('&', map { "$_=$args{$_}" } keys %args);
+    $path .= "?$query" if $query;
+
+    my $result = $self->api_call($method, $path);
+    if ($result->{code} != OK_NO_CONTENT_CODE) {
+        WebService::Hydra::Exception::RevokeLoginSessionsFailed->new(
+            message  => "Failed to revoke login sessions",
+            category => "client",
+            details  => $result
+        )->throw;
+    }
+    return $result->{data};
+} 
 
 1;
