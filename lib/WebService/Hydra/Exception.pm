@@ -1,9 +1,12 @@
+package WebService::Hydra::Exception;
+
+use strict;
+use warnings;
+
 use Object::Pad;
 
 class WebService::Hydra::Exception;
 
-use strict;
-use warnings;
 use File::Spec;
 use Module::Load;
 use JSON::MaybeUTF8 qw(encode_json_text);
@@ -59,7 +62,6 @@ method as_string {
     push @substrings, "Category=$category"                    if $category;
     push @substrings, "Message=$message"                      if $message;
     push @substrings, "Details=" . encode_json_text($details) if @$details;
-
     $string .= "(" . join(", ", @substrings) . ")" if @substrings;
     return $string;
 }

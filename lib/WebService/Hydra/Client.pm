@@ -1,9 +1,11 @@
-use Object::Pad;
-
-class WebService::Hydra::Client;
+package WebService::Hydra::Client;
 
 use strict;
 use warnings;
+
+use Object::Pad;
+
+class WebService::Hydra::Client;
 
 use HTTP::Tiny;
 use Log::Any   qw( $log );
@@ -59,13 +61,13 @@ This is a required parameter when creating Hydra Client Object using new.
 
 Returns the base URL for the hydra service.
 
-=cut 
+=cut
 
 =head2 public_endpoint
 
 Returns the base URL for the hydra service.
 
-=cut 
+=cut
 
 =head2 http
 
@@ -102,7 +104,7 @@ Takes request method, the endpoint, and the payload. It sends the request to the
 1. JSON object of code and data returned from the service.
 2. Error string in case an exception is thrown.
 
-=cut 
+=cut
 
 method api_call ($method, $endpoint, $payload = undef, $content_type = 'json') {
 
@@ -159,7 +161,7 @@ Arguments:
 =item C<$login_challenge>
 
 Authentication challenge string that is used to identify and fetch information
-about the OAuth2 request from hydra. 
+about the OAuth2 request from hydra.
 
 =back
 

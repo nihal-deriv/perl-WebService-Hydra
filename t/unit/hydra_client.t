@@ -416,7 +416,7 @@ subtest 'revoke_login_sessions' => sub {
     is_deeply $got , $mock_api_response->{data}, 'api_call response correctly parsed';
 
     @params = ();
-    my $got = $client->revoke_login_sessions(sid => '1234');
+    $got = $client->revoke_login_sessions(sid => '1234');
 
     is $params[1], 'DELETE',                                                                'DELETE request method';
     is $params[2], 'http://dummyhydra.com/admin/admin/oauth2/auth/sessions/login?sid=1234', 'Request URL built with correct parameters';
