@@ -13,6 +13,8 @@ my @exceptions_to_test = qw(
     InvalidIdToken
     InvalidConsentChallenge
     InternalServerError
+    InvalidClaims
+    InvalidToken
 );
 
 # Test that all exception classes can be loaded successfully

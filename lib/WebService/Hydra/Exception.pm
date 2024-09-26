@@ -106,6 +106,8 @@ my @all_exceptions = qw(
     InvalidConsentChallenge
     InternalServerError
     RevokeLoginSessionsFailed
+    InvalidToken
+    InvalidClaims
 );
 
 =head2 import
