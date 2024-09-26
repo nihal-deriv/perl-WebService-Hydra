@@ -407,20 +407,19 @@ subtest 'revoke_login_sessions' => sub {
     # Test for 200 OK status code
     $mock_api_response = {
         code => 204,
-        data => undef};
+        data => undef
+    };
     my $got = $client->revoke_login_sessions(subject => '1234');
 
-    is $params[1], 'DELETE', 'DELETE request method';
-    is $params[2], 'http://dummyhydra.com/admin/admin/oauth2/auth/sessions/login?subject=1234',
-        'Request URL built with correct parameters';
+    is $params[1], 'DELETE',                                                                    'DELETE request method';
+    is $params[2], 'http://dummyhydra.com/admin/admin/oauth2/auth/sessions/login?subject=1234', 'Request URL built with correct parameters';
     is_deeply $got , $mock_api_response->{data}, 'api_call response correctly parsed';
-    
+
     @params = ();
     my $got = $client->revoke_login_sessions(sid => '1234');
 
-    is $params[1], 'DELETE', 'DELETE request method';
-    is $params[2], 'http://dummyhydra.com/admin/admin/oauth2/auth/sessions/login?sid=1234',
-        'Request URL built with correct parameters';
+    is $params[1], 'DELETE',                                                                'DELETE request method';
+    is $params[2], 'http://dummyhydra.com/admin/admin/oauth2/auth/sessions/login?sid=1234', 'Request URL built with correct parameters';
     is_deeply $got , $mock_api_response->{data}, 'api_call response correctly parsed';
 
     # Test for other non-200 status codes
@@ -448,7 +447,6 @@ subtest 'revoke_login_sessions' => sub {
 
     dies_ok { $client->accept_logout_request("VALID_CHALLENGE") } 'Dies if http request fails for some reason';
 };
-
 
 subtest 'fetch_openid_configuration' => sub {
     my $mock_hydra = Test::MockModule->new('WebService::Hydra::Client');

@@ -13,7 +13,7 @@ use WebService::Hydra::Exception;
 use Syntax::Keyword::Try;
 
 use constant OK_STATUS_CODE          => 200;
-use constant OK_NO_CONTENT_CODE    => 204;
+use constant OK_NO_CONTENT_CODE      => 204;
 use constant BAD_REQUEST_STATUS_CODE => 400;
 
 our $VERSION = '0.01';
@@ -438,8 +438,6 @@ method accept_consent_request ($consent_challenge, $params) {
     return $result->{data};
 }
 
-
-
 =head2 revoke_login_sessions
 
 This endpoint invalidates authentication sessions.
@@ -450,8 +448,8 @@ It expects a user ID (subject) and invalidates all sessions for this user. or se
 method revoke_login_sessions (%args) {
     my $method = "DELETE";
     my $path   = "$admin_endpoint/admin/oauth2/auth/sessions/login";
-    
-    my $query  = join('&', map { "$_=$args{$_}" } keys %args);
+
+    my $query = join('&', map { "$_=$args{$_}" } keys %args);
     $path .= "?$query" if $query;
 
     my $result = $self->api_call($method, $path);
@@ -463,6 +461,6 @@ method revoke_login_sessions (%args) {
         )->throw;
     }
     return $result->{data};
-} 
+}
 
 1;

@@ -13,10 +13,9 @@ class WebService::Hydra::Exception::InvalidConsentChallenge :isa(WebService::Hyd
 
         $args{message}  //= 'Invalid Consent Challenge';
         $args{category} //= 'client';
-       
+
         return %args;
     }
 }
-
 
 1;

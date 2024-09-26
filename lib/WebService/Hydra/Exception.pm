@@ -7,7 +7,7 @@ use warnings;
 use File::Spec;
 use Module::Load;
 use JSON::MaybeUTF8 qw(encode_json_text);
-use Log::Any qw($log);
+use Log::Any        qw($log);
 
 ## VERSION
 
@@ -32,7 +32,6 @@ BUILD {
     die ref($self) . " is a base class and cannot be instantiated directly." if ref($self) eq __PACKAGE__;
 }
 
-
 =head1 Methods
 
 =head2 throw
@@ -53,11 +52,12 @@ sub throw {
 Returns a string representation of the exception.
 
 =cut
+
 method as_string {
-    my $string = blessed($self);
+    my $string     = blessed($self);
     my @substrings = ();
-    push @substrings, "Category=$category" if $category;
-    push @substrings, "Message=$message" if $message;
+    push @substrings, "Category=$category"                    if $category;
+    push @substrings, "Message=$message"                      if $message;
     push @substrings, "Details=" . encode_json_text($details) if @$details;
 
     $string .= "(" . join(", ", @substrings) . ")" if @substrings;
@@ -73,9 +73,9 @@ Returns a JSON string representation of the exception.
 method as_json {
     my $data = {
         Exception => blessed($self),
-        Category => $self->category,
-        Message  => $self->message,
-        Details  => $self->details,
+        Category  => $self->category,
+        Message   => $self->message,
+        Details   => $self->details,
     };
     return encode_json_text($data);
 }
@@ -91,7 +91,6 @@ method log {
     my $stats_name = blessed($self);
     $stats_name =~ s/::/./g;
 }
-
 
 # Exception class names explicitly listed
 my @all_exceptions = qw(
@@ -127,7 +126,7 @@ sub import {
         my $module_name = "WebService::Hydra::Exception::$exception";
 
         eval {
-            load $module_name;          # Load the exception module
+            load $module_name;    # Load the exception module
             1;
         } or warn "Failed to load module $module_name: $@";
     }

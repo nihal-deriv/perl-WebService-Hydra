@@ -10,13 +10,12 @@ class WebService::Hydra::Exception::InvalidLoginRequest :isa(WebService::Hydra::
 
     sub BUILDARGS {
         my ($class, %args) = @_;
-      
+
         $args{message}  //= 'Invalid Login Request';
         $args{category} //= 'client';
-        
+
         return %args;
     }
 }
-
 
 1;

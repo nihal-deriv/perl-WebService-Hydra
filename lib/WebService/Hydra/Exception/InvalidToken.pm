@@ -6,7 +6,6 @@ use Object::Pad;
 ## VERSION
 
 class WebService::Hydra::Exception::InvalidToken :isa(WebService::Hydra::Exception) {
-    
 
     sub BUILDARGS {
         my ($class, %args) = @_;
@@ -17,6 +16,5 @@ class WebService::Hydra::Exception::InvalidToken :isa(WebService::Hydra::Excepti
         return %args;
     }
 }
-
 
 1;

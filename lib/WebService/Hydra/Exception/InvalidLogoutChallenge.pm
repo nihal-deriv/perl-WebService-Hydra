@@ -10,10 +10,10 @@ class WebService::Hydra::Exception::InvalidLogoutChallenge :isa(WebService::Hydr
 
     sub BUILDARGS {
         my ($class, %args) = @_;
-        
+
         $args{message}  //= 'Invalid Logout Challenge';
         $args{category} //= 'client';
-        
+
         return %args;
     }
 }
