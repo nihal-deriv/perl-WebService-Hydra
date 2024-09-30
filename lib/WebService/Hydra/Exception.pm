@@ -7,7 +7,6 @@ use Object::Pad;
 
 class WebService::Hydra::Exception;
 
-use File::Spec;
 use Module::Load;
 use JSON::MaybeUTF8 qw(encode_json_text);
 use Log::Any        qw($log);
