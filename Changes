@@ -1,4 +1,5 @@
 {{$NEXT}}
+  - Bug fix in `validate_token` and `validate_id_token` methods.
 
 0.001     2024-09-30 03:56:03+00:00 UTC
   - Initial release
