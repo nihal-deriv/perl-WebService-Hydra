@@ -18,7 +18,7 @@ use constant OK_STATUS_CODE          => 200;
 use constant OK_NO_CONTENT_CODE      => 204;
 use constant BAD_REQUEST_STATUS_CODE => 400;
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 field $http;
 field $jwks;
