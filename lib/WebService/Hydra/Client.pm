@@ -285,7 +285,6 @@ Exchanges the authorization code with Hydra service for access and ID tokens.
 method exchange_token ($exchange_payload) {
     my $method     = "POST";
     my $path       = "$public_endpoint/oauth2/token";
-    my $grant_type = "authorization_code";
     my $payload    = {
         grant_type => 'authorization_code',
         $exchange_payload->%*
