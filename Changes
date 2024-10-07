@@ -1,5 +1,5 @@
 {{$NEXT}}
-
+  - Updated `exchange_token` to support caller payload
 0.002     2024-10-02 22:21:04+00:00 UTC
   - Bug fix in `validate_token` and `validate_id_token` methods.
 
