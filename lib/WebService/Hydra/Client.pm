@@ -282,22 +282,14 @@ Exchanges the authorization code with Hydra service for access and ID tokens.
 
 =cut
 
-method exchange_token ($args) {
+method exchange_token ($exchange_payload) {
     my $method     = "POST";
     my $path       = "$public_endpoint/oauth2/token";
     my $grant_type = "authorization_code";
     my $payload    = {
-        code          => $args->{code},
-        grant_type    => $grant_type,
-        client_id     => $args->{client_id},
-        redirect_uri  => $args->{redirect_uri}
+        grant_type => 'authorization_code',
+        $exchange_payload->%*
     };
-    if($args->{client_secret}){
-        $payload->{client_secret} = $args->{client_secret};
-    }
-    if($args->{code_verifier}){
-        $payload->{code_verifier} = $args->{code_verifier};
-    }
     my $result = $self->api_call($method, $path, $payload, 'FORM');
     if ($result->{code} != OK_STATUS_CODE) {
         WebService::Hydra::Exception::TokenExchangeFailed->new(
